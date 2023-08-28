@@ -6,7 +6,14 @@ from django.urls import reverse
 
 from .models import *
 
-# Code below provided from previous assignments
+def index(request):
+    return render(request, "tracker/index.html")
+
+def search(request):
+    query = request.GET.get('q')
+    
+
+# Code below and their corresponding templates adapted from previous assignments
 def login_view(request):
     if request.method == "POST":
 
@@ -20,11 +27,11 @@ def login_view(request):
             login(request, user)
             return HttpResponseRedirect(reverse("index"))
         else:
-            return render(request, "auctions/login.html", {
+            return render(request, "tracker/login.html", {
                 "message": "Invalid username and/or password."
             })
     else:
-        return render(request, "auctions/login.html")
+        return render(request, "tracker/login.html")
 
 
 def logout_view(request):
@@ -41,7 +48,7 @@ def register(request):
         password = request.POST["password"]
         confirmation = request.POST["confirmation"]
         if password != confirmation:
-            return render(request, "auctions/register.html", {
+            return render(request, "tracker/register.html", {
                 "message": "Passwords must match."
             })
 
@@ -50,10 +57,10 @@ def register(request):
             user = User.objects.create_user(username, email, password)
             user.save()
         except IntegrityError:
-            return render(request, "auctions/register.html", {
+            return render(request, "tracker/register.html", {
                 "message": "Username already taken."
             })
         login(request, user)
         return HttpResponseRedirect(reverse("index"))
     else:
-        return render(request, "auctions/register.html")
+        return render(request, "tracker/register.html")

@@ -1,0 +1,21 @@
+.form-control {
+    margin-bottom: 7px;
+}
+
+.indent {
+    margin: 1vw;
+}
+
+.navbar {
+    background-color: #B2B7C0;
+}
+
+.redirect {
+    color: black;
+    text-decoration: none;
+}
+
+#nav-left {
+    margin-left: .4vw;
+}
+

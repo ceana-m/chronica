@@ -1,0 +1,24 @@
+{% extends "tracker/layout.html" %}
+{% load static %}
+
+{% block title %}
+    Search
+{% endblock %}
+
+{% block body %}
+    <div class="indent">
+        {% if message %}
+            <div class="form-text">{{ message }}</div>
+        {% endif %}
+
+        <form action="{% url 'search' %}" method="GET">
+            {% csrf_token %}
+                <input autofocus class="form-control search" type="text" name="q" placeholder="Search for a Book, Movie, or TV Show">
+        </form>  
+    </div>
+
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'tracker/index.js' %}"></script>
+{% endblock %}

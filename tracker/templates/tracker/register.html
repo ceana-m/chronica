@@ -1,0 +1,28 @@
+{% extends "tracker/layout.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block body %}
+    <!-- Template based on previous assignments -->
+    <div class="indent">
+       <h2>Register</h2>
+
+        {% if message %}
+            <div class="form-text">{{ message }}</div>
+        {% endif %}
+
+        <form action="{% url 'register' %}" method="post">
+            {% csrf_token %}
+                <input class="form-control" autofocus type="text" name="username" placeholder="Username">
+                <input class="form-control" type="email" name="email" placeholder="Email Address">
+                <input class="form-control" type="password" name="password" placeholder="Password">
+                <input class="form-control" type="password" name="confirmation" placeholder="Confirm Password">
+                <input class="btn btn-primary" type="submit" value="Register">
+        </form>
+        <br/>
+        <a class="redirect" href="{% url 'login' %}">Log in here.</a> 
+    </div>
+
+{% endblock %}

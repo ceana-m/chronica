@@ -1,0 +1,28 @@
+{% extends "tracker/layout.html" %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block body %}
+    <!-- Template based on previous assignments -->
+    <div class="indent">
+        <h2>Login</h2>
+
+        {% if message %}
+            <div class="form-text">{{ message }}</div>
+        {% endif %}
+
+        <form action="{% url 'login' %}" method="post">
+            {% csrf_token %}
+                <input autofocus class="form-control" type="text" name="username" placeholder="Username">
+                <input class="form-control" type="password" name="password" placeholder="Password">
+                <input id="login-btn" class="btn btn-primary" type="submit" value="Login">
+        </form>
+        <br/>
+        <a class="redirect" href="{% url 'register' %}">Register here</a> to create an account.   
+    </div>
+
+    
+
+{% endblock %}
