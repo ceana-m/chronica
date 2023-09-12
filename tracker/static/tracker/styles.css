@@ -1,3 +1,35 @@
+.card-img-top {
+    height: 290px;
+}
+
+.container-fluid {
+    align-items: center;
+}
+
+.add {
+    padding-left: 6px;
+    padding-right: 6px;
+    font-size: 14px;
+    padding-top: 2.7px;
+}
+
+.add:hover {
+    --bs-badge-color: red;
+}
+
+.link {
+    text-decoration: none;
+    color: black;
+}
+
+.media {
+    display: inline-block;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    width: 12rem;
+    border-width: 0px;
+}
+
 .form-control {
     margin-bottom: 7px;
 }
@@ -6,13 +38,48 @@
     margin: 1vw;
 }
 
+.lead {
+    font-size: 14px;
+}
+
+.mvbtn {
+  margin-left: 115px;  
+}
+
 .navbar {
     background-color: #B2B7C0;
+}
+
+.no-poster {
+    text-align: center; 
+    margin-top: 60px; 
+    margin-bottom: 205px;
+}
+
+.no-poster-info {
+    width: 342;
+}
+
+.plus {
+    --bs-btn-padding-y: .05rem; 
+    --bs-btn-padding-x: .3rem; 
+    --bs-btn-font-size: .75rem;
+    /* --bs-btn-border-radius: 10rem; */
 }
 
 .redirect {
     color: black;
     text-decoration: none;
+}
+
+.title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tvbtn {
+    margin-left: 135px;  
 }
 
 #nav-left {

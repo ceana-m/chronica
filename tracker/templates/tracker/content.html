@@ -1,0 +1,45 @@
+{% extends "tracker/layout.html" %}
+{% load static %}
+
+{% block title %}
+    Search for a {{ type }}
+{% endblock %}
+
+{% block body %}
+    <div id="searchbar">
+        <form id="search" action="" method="GET"> 
+            <input autofocus class="form-control search" type="text" name="q" placeholder="Search for a {{ type }}" required>
+        </form>
+    </div>
+
+    <div id="message"></div>
+
+    <div id="display" class="col-md-9 offset-md-2">
+        <div class="card shadow media">
+            <a class="link" href="https://www.google.com/">
+                <img src="https://image.tmdb.org/t/p/w185/1E5baAaEse26fej7uHcjOgEE2t2.jpg" class="card-img-top" alt="...">
+            
+                <div class="card-body">
+                    <span class="badge text-bg-danger">Movie</span>
+                    <p class="card-text">Some quick example text.</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="card shadow media">
+            <a class="link" href="https://www.google.com/">
+                <p class="no-poster"><i>No Poster</i></p>
+                <div class="card-body">
+                    <span class="badge text-bg-danger">Movie</span>
+                    <p class="card-text">Some quick example text.</p>
+                </div>
+            </a>
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'tracker/confid.js' %}"></script>
+    <script src="{% static 'tracker/content.js' %}"></script>
+{% endblock %}

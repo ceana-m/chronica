@@ -1,3 +1,3 @@
-# Media Tracker
+# Chronicle
 
 ## Distinctiveness and Complexity

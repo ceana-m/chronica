@@ -1,0 +1,55 @@
+{% extends "tracker/layout.html" %}
+{% load static %}
+
+{% block title %}
+    {{ person }}'s Lists
+{% endblock %}
+
+{% block body %}
+    <h2>{{ person }}'s Lists</h2>
+
+    {% if user.username == person %}
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#staticBackdrop" style="margin-bottom: 10px;">
+        Create List
+    </button>
+    
+    <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Create a new list</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form method="post">
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        {{ form }}
+                    </div>
+                    <div class="modal-footer">
+                        <!-- <button type="submit" class="btn btn-secondary" data-bs-dismiss="modal">Save</button> -->
+                        <button type="submit" class="btn btn-secondary">Save</button>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% for list in lists %}
+    
+        <div class="card" style="margin-bottom: 10px;">
+            <a href="{% url 'list' person list.id %}" class="link">
+                <div class="card-body">
+                    <h5 class="card-title">{{ list.title }}</h5>
+                    <h6 class="card-subtitle mb-2 text-body-secondary">Card subtitle</h6>
+                    <p class="card-text">{{ list.description }}</p>
+                </div>
+            </a>
+        </div>
+    
+    {% endfor %}
+
+{% endblock %}

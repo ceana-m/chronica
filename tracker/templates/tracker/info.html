@@ -1,0 +1,110 @@
+{% extends "tracker/layout.html" %}
+{% load static %}
+
+{% block title %}
+  {% if type == 'movie' %}
+    {{ media.title }}
+  {% else %}
+    {{ media.name }}
+  {% endif %}
+{% endblock %}
+
+{% block body %}
+  {% if media.poster_path %}
+      <img src="https://image.tmdb.org/t/p/w342{{ media.poster_path }}" class="figure-img img-fluid rounded shadow" alt="Poster">
+  
+      <div class="card no-poster-info" style="width: auto1px;">
+        <div class="card-body">
+          This is some text within a card body.
+        </div>
+      </div>
+  {% endif %}
+  
+  {% if type == 'movie' %}
+      <h2>{{ media.title }}</h2>
+  {% elif type == 'tv' %}
+      <h2>{{ media.name }}</h2>
+  {% endif %}
+  
+  <dl class="row">
+      {% if media.overview %}
+        <dt class="col-sm-2">Synopsis</dt>
+        <dd class="col-sm-10">{{ media.overview }}</dd>
+      {% endif %}
+
+      {% if type == 'movie' %}
+          <dt class="col-sm-2">Runtime</dt>
+          <dd class="col-sm-10">{{ media.runtime }} minutes</dd>
+
+          <dt class="col-sm-2">Release date</dt>
+          <dd class="col-sm-10">{{ media.release_date }}</dd>
+      {% elif type == 'tv' %}
+          <dt class="col-sm-2">Seasons</dt>
+          <dd class="col-sm-10">{{ media.number_of_seasons }}</dd>
+
+          <dt class="col-sm-2">Episodes</dt>
+          <dd class="col-sm-10">{{ media.number_of_episodes }}</dd>
+          
+          <dt class="col-sm-2">Episode Runtime</dt>
+          <dd class="col-sm-10">{% for time in media.episode_run_time %}{{ time }}{% endfor %} minutes</dd>
+
+          <dt class="col-sm-2">Airing</dt>
+          <dd class="col-sm-10">{{ media.first_air_date }} to {{ media.last_air_date }}</dd>
+      {% endif %}
+      <dt class="col-sm-2">Status</dt>
+      <dd class="col-sm-10"><i>{{ media.status }}</i></dd>
+
+      <dt class="col-sm-2">Genre(s)</dt>
+      <dd class="col-sm-10">
+      {% for genre in media.genres %} 
+          <span class="badge text-bg-light">{{ genre.name }}</span>
+      {% endfor %}
+      </dd>
+  </dl>
+  
+  {% if type == 'tv' %}
+  <div class="d-grid gap-2">
+    <button type="button" class="btn btn-block btn-outline-secondary">Seasons Info</button>
+  </div>
+  <dt class="col-sm-2">Seasons Info</dt>
+  <div class="accordion" id="accordionExample">
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+            Accordion Item #1
+          </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+            <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+            Accordion Item #2
+          </button>
+        </h2>
+        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+            <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+            Accordion Item #3
+          </button>
+        </h2>
+        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+            <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+{% endblock %}
