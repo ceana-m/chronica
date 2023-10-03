@@ -1,26 +1,25 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
+from django.views.decorators.csrf import ensure_csrf_cookie
+from numpy import arange
 
-from .models import *
-from .forms import *
-
-import requests
 from .confid import *
+from .forms import *
+from .models import *
+
+import json
+import requests
+
 
 def index(request):
     return render(request, "tracker/index.html")
 
-# def search(request):
-#     return render(request, "tracker/content.html", {
-#         'type': 'Book'
-#     })
-
 @login_required(login_url='/login')
-def user(request, user):
+def user_lists(request, user):
     try:
         User.objects.get(username=user)
     except User.DoesNotExist:
@@ -28,8 +27,8 @@ def user(request, user):
     if request.method == 'POST':
         form = NewList(request.POST)
         if form.is_valid():
-            List.objects.create(user=User.objects.get(username=request.user.username), title=form.cleaned_data['title'], description=form.cleaned_data['description'])
-    return render(request, "tracker/user.html", {
+            List.objects.create(user=get_current_user(request), title=form.cleaned_data['title'], description=form.cleaned_data['description'])
+    return render(request, "tracker/user_lists.html", {
         'person': user,
         'form': NewList(),
         'lists': List.objects.filter(user=User.objects.get(username=user))
@@ -52,10 +51,60 @@ def movie_info(request, id):
         "Authorization": f"Bearer {TMDB_TOKEN}"
     }
     response = requests.get(url, headers=headers)
+    response_data = response.json()
+    try:
+        media = Media.objects.get(obj_id=response_data['id'], media_type='movie')
+        review = Review.objects.get(user=get_current_user(request), media=media)
+        old_review = NewReview(instance=review)
+    except Review.DoesNotExist:
+        review = 0
+        old_review = NewReview()
+    except Media.DoesNotExist:
+        media = 0
+        old_review = NewReview()
+
+    # prev_review = Review.objects.get()
+    if request.method == "POST":
+        form = NewReview(request.POST)
+        error = {
+            'type': 'movie',
+            'media': response_data,
+            'message': 'Please enter a valid rating number (0.0 - 5.0 with 0.5 increments)',
+            'review_form': form,
+            'lists': List.objects.filter(user=get_current_user(request))
+        }
+        if form.is_valid():
+            rating = form.cleaned_data['rating']
+            text = form.cleaned_data['text']
+            vals = arange(0.0, 5.1, 0.5)
+            if rating not in vals:
+                return render(request, "tracker/info.html", error)
+            
+            if media == 0:
+                media = Media.objects.create(obj_id=response_data['id'], media_type='movie', data=response_data)
+                Review.objects.create(user=get_current_user(request), rating=rating, text=text, media=media)
+            elif review == 0:
+                Review.objects.create(user=get_current_user(request), rating=rating, text=text, media=media)
+            else:
+                review.rating = rating
+                review.text = text
+                review.save()
+
+            return render(request, "tracker/info.html", {
+                'type': 'movie',
+                'media': response.json(),
+                'review_form': NewReview(instance=review),
+                'lists': List.objects.filter(user=get_current_user(request)),
+                'show': True
+            })
+        else:
+            return render(request, "tracker/info.html", error)
 
     return render(request, "tracker/info.html", {
         'type': 'movie',
-        'media': response.json()
+        'media': response.json(),
+        'review_form': old_review,
+        'lists': List.objects.filter(user=get_current_user(request))
     })
 
 def tv(request):
@@ -73,7 +122,8 @@ def tv_info(request, id):
 
     return render(request, "tracker/info.html", {
         'type': 'tv',
-        'media': response.json()
+        'media': response.json(),
+        'review_form': NewReview()
     })
 
 def list_view(request, user, id):
@@ -85,6 +135,19 @@ def list_view(request, user, id):
         'person': user,
         'list': list_obj
     })
+
+# Helper method
+def get_current_user(request):
+    return User.objects.get(username=request.user.username)
+
+def format_media_type(media_type):
+    if media_type == 'movie':
+        return 'Movie'
+    elif media_type == 'tv':
+        return 'TV'
+    elif media_type == 'book':
+        return 'Book'
+    return None
 
 # Code below and their corresponding templates adapted from previous assignments
 def login_view(request):
@@ -137,3 +200,149 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "tracker/register.html")
+    
+#API methods (based on prev assignments)
+def movie_review(request, id):
+    # Query for requested movie
+    try:
+        review = Review.objects.get(pk=id)
+    except Movie.DoesNotExist:
+        return JsonResponse({"error": "Review not found."}, status=404)
+
+    # Return movie attributes
+    if request.method == "GET":
+        return JsonResponse(review.serialize())
+
+    # Update 
+    elif request.method == "POST":
+        data = json.loads(request.body)
+        if data.get('rating') is not None:
+            review.rating = data["rating"]
+        if data.get('text') is not None:
+            review.text = data["text"]
+        else:
+            return JsonResponse({
+                "error": "Must provide a rating or text for the movie."
+            }, status=400)
+        review.save()
+        return HttpResponse(status=204)
+
+    # Movie must be via GET or PUT
+    else:
+        return JsonResponse({
+            "error": "GET or POST request required."
+        }, status=400)
+
+def lists_api(request, list_id):
+    # Query for requested list
+    try:
+        list_obj = List.objects.get(pk=list_id)
+    except List.DoesNotExist:
+        return JsonResponse({"error": "List not found."}, status=404)
+
+    # Return list attributes
+    if request.method == "GET":
+        return JsonResponse(list_obj.serialize())
+
+    # Update 
+    elif request.method == "PUT":
+        data = json.loads(request.body)
+        try: 
+            media = Media.objects.get(media_type=data.get('mediaType'), obj_id=data.get('obj_id'))
+        except Media.DoesNotExist:
+            return JsonResponse({
+                "error ": "Media item does not exist."
+            }, status=400)
+        
+        if data.get('action') in ['add', 'remove']:
+            if data.get('mediaType') in ['movie', 'tv', 'book']:
+                if data.get('obj_id') is not None:
+                    if data.get('action') == 'add':
+                        list_obj.media.add(media)
+                    elif data.get('action') == 'remove':
+                        list_obj.media.remove(media)
+                else:
+                    return JsonResponse({
+                        "error": "Must provide a valid object id."
+                    }, status=400)
+            else:
+                return JsonResponse({
+                    "error": "Must provide a valid media type ('movie', 'tv', or 'book')."
+                }, status=400)
+        else:
+            return JsonResponse({
+                "error": "Must provide valid List action ('add' or 'remove')."
+            }, status=400)
+        return HttpResponse(status=204)
+
+    #List must be via GET or PUT
+    else:
+        return JsonResponse({
+            "error": "GET or PUT request required."
+        }, status=400)
+    
+def review(request, id): # This needs to be fixed (add POST??)
+    try:
+        review = Review.objects.get(pk=id)
+    except Movie.DoesNotExist:
+        return JsonResponse({"error": "Review not found."}, status=404)
+
+    if request.method == "GET":
+        return JsonResponse(review.serialize())
+
+    elif request.method == "POST":
+        data = json.loads(request.body)
+        if data.get('rating') is not None:
+            review.rating = data["rating"]
+        if data.get('text') is not None:
+            review.text = data["text"]
+        else:
+            return JsonResponse({
+                "error": "Must provide a rating for the review."
+            }, status=400)
+        review.save()
+        return HttpResponse(status=204)
+
+    else:
+        return JsonResponse({
+            "error": "GET or POST request required."
+        }, status=400)
+    
+@ensure_csrf_cookie
+def media(request, media_type, media_id):
+    try:
+        media = Media.objects.get(media_type=media_type, obj_id=media_id)
+    except Media.DoesNotExist:
+        if request.method == "POST":
+            data = json.loads(request.body)
+            if data.get('obj_id') is not None or data.get('media_type') is not None:
+                if data.get('mediaType') in ['movie', 'tv', 'book']:
+                    if data.get('data') is not None:
+                        Media.objects.create(obj_id=data['obj_id'], media_type=data["mediaType"], data=json.loads(data['data']))
+                        return HttpResponse(status=204)
+                    else:
+                        return JsonResponse({
+                            "error": "Must provide data to be stored."
+                        }, status=400)
+                else:
+                    return JsonResponse({
+                        "error": "Must provide a valid media type ('movie', 'tv', or 'book')."
+                    }, status=400)
+            else:
+                return JsonResponse({
+                    "error": "Must provide an object id for API use as well as a media type."
+                }, status=400)
+        else:
+            return JsonResponse({"error": "Media item not found. POST request required."}, status=404)
+    
+    if request.method == "POST":
+        return HttpResponse(status=204)
+
+    if request.method == "GET":
+        return JsonResponse(media.serialize())
+
+    else:
+        return JsonResponse({
+            "error": "GET or POST request required."
+        }, status=400)
+        

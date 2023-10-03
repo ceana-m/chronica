@@ -6,15 +6,12 @@
     align-items: center;
 }
 
-.add {
-    padding-left: 6px;
-    padding-right: 6px;
-    font-size: 14px;
-    padding-top: 2.7px;
+.inline {
+    display: inline;
 }
 
-.add:hover {
-    --bs-badge-color: red;
+.inline-block {
+    display: inline-block;
 }
 
 .link {
@@ -38,6 +35,17 @@
     margin: 1vw;
 }
 
+.info-container {
+    display: flex; 
+    align-items: flex-start;
+}
+
+.info-card {
+    display: inline-block; 
+    width: 85rem; 
+    border-width: 0px;
+}
+
 .lead {
     font-size: 14px;
 }
@@ -53,18 +61,21 @@
 .no-poster {
     text-align: center; 
     margin-top: 60px; 
-    margin-bottom: 205px;
+    margin-bottom: 173px;
 }
 
 .no-poster-info {
-    width: 342;
+    display: inline-block;
+    width: 342px;
+    padding-top: 228px;
+    padding-bottom: 226px;
+    margin-bottom: 10px;
 }
 
 .plus {
     --bs-btn-padding-y: .05rem; 
     --bs-btn-padding-x: .3rem; 
     --bs-btn-font-size: .75rem;
-    /* --bs-btn-border-radius: 10rem; */
 }
 
 .redirect {

@@ -2,10 +2,31 @@
 {% load static %}
 
 {% block title %}
-    Error!
+    {{ list.title }}
 {% endblock %}
 
 {% block body %}
     <h2>{{ list.title }}</h2>
     <p>{{ list.description }}</p>
+    <button type="button" class="btn btn-outline-danger">Delete List</button>
+    <button type="button" class="btn btn-outline-primary">Edit</button>
+    <hr/>
+    <div class="display"  style="margin-left: 12.4vw; margin-right: 5vw;">
+        {% for item in list.media.all %}
+            <div class="card media shadow-sm">
+            <a class="link" href="/movies/{{ item.data.id }}">
+                    <img src="https://image.tmdb.org/t/p/w185{{item.data.poster_path}}" class="card-img-top" alt="Poster">
+                    <div class="card-body" style="padding: 0px;">
+                        <span class="badge text-bg-danger">Movie</span>
+                        <p class="card-text">{{ item.data.title }}</p>
+                    </div>
+                </a> 
+            </div>
+        {% endfor %}
+    </div>
+    
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'tracker/list.js' %}"></script>
 {% endblock %}

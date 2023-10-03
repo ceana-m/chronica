@@ -10,101 +10,134 @@
 {% endblock %}
 
 {% block body %}
+<div class="info-container">
   {% if media.poster_path %}
-      <img src="https://image.tmdb.org/t/p/w342{{ media.poster_path }}" class="figure-img img-fluid rounded shadow" alt="Poster">
-  
-      <div class="card no-poster-info" style="width: auto1px;">
-        <div class="card-body">
-          This is some text within a card body.
+      <img src="https://image.tmdb.org/t/p/w342{{ media.poster_path }}" class="figure-img img-fluid rounded shadow" alt="Poster" style="display: inline;">
+  {% else %}
+      <div class="card no-poster-info">
+        <div class="card-body" style="text-align: center;">
+          <i>No Poster</i>
         </div>
       </div>
   {% endif %}
-  
-  {% if type == 'movie' %}
-      <h2>{{ media.title }}</h2>
-  {% elif type == 'tv' %}
-      <h2>{{ media.name }}</h2>
-  {% endif %}
-  
-  <dl class="row">
-      {% if media.overview %}
-        <dt class="col-sm-2">Synopsis</dt>
-        <dd class="col-sm-10">{{ media.overview }}</dd>
-      {% endif %}
 
+  <div class="card info-card">
+    <div class="card-body">
       {% if type == 'movie' %}
-          <dt class="col-sm-2">Runtime</dt>
-          <dd class="col-sm-10">{{ media.runtime }} minutes</dd>
-
-          <dt class="col-sm-2">Release date</dt>
-          <dd class="col-sm-10">{{ media.release_date }}</dd>
+          <h2 class="inline">{{ media.title }}</h2>
       {% elif type == 'tv' %}
-          <dt class="col-sm-2">Seasons</dt>
-          <dd class="col-sm-10">{{ media.number_of_seasons }}</dd>
-
-          <dt class="col-sm-2">Episodes</dt>
-          <dd class="col-sm-10">{{ media.number_of_episodes }}</dd>
-          
-          <dt class="col-sm-2">Episode Runtime</dt>
-          <dd class="col-sm-10">{% for time in media.episode_run_time %}{{ time }}{% endfor %} minutes</dd>
-
-          <dt class="col-sm-2">Airing</dt>
-          <dd class="col-sm-10">{{ media.first_air_date }} to {{ media.last_air_date }}</dd>
+          <h2 class="inline">{{ media.name }}</h2>
       {% endif %}
-      <dt class="col-sm-2">Status</dt>
-      <dd class="col-sm-10"><i>{{ media.status }}</i></dd>
+      <span id="list-count" class="badge text-bg-secondary inline-block" style="margin-bottom: 10px; margin-left: 5px;">Added to 0 lists</span>
+      
+      <dl class="row">
+          {% if media.overview %}
+            <dt class="col-sm-2">Synopsis</dt>
+            <dd class="col-sm-10">{{ media.overview }}</dd>
+          {% endif %}
 
-      <dt class="col-sm-2">Genre(s)</dt>
-      <dd class="col-sm-10">
-      {% for genre in media.genres %} 
-          <span class="badge text-bg-light">{{ genre.name }}</span>
-      {% endfor %}
-      </dd>
-  </dl>
-  
-  {% if type == 'tv' %}
-  <div class="d-grid gap-2">
-    <button type="button" class="btn btn-block btn-outline-secondary">Seasons Info</button>
-  </div>
-  <dt class="col-sm-2">Seasons Info</dt>
-  <div class="accordion" id="accordionExample">
-      <div class="accordion-item">
-        <h2 class="accordion-header">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-            Accordion Item #1
-          </button>
-        </h2>
-        <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-          <div class="accordion-body">
-            <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-          </div>
+          {% if type == 'movie' %}
+              <dt class="col-sm-2">Runtime</dt>
+              <dd class="col-sm-10">{{ media.runtime }} minutes</dd>
+
+              {% if media.release_date %}
+              <dt class="col-sm-2">Release date</dt>
+              <dd class="col-sm-10">{{ media.release_date }}</dd>
+              {% endif %}
+          {% elif type == 'tv' %}
+              <dt class="col-sm-2">Seasons</dt>
+              <dd class="col-sm-10">{{ media.number_of_seasons }}</dd>
+
+              <dt class="col-sm-2">Total Episodes</dt>
+              <dd class="col-sm-10">{{ media.number_of_episodes }}</dd>
+              
+              <dt class="col-sm-2">Episode Runtime</dt>
+              <dd class="col-sm-10">{% for time in media.episode_run_time %}{{ time }}{% endfor %} minutes</dd>
+
+              <dt class="col-sm-2">Airing</dt>
+              <dd class="col-sm-10">{{ media.first_air_date }} to {{ media.last_air_date }}</dd>
+          {% endif %}
+          <dt class="col-sm-2">Status</dt>
+          <dd class="col-sm-10"><i>{{ media.status }}</i></dd>
+
+          {% if media.genres %}
+          <dt class="col-sm-2">Genre(s)</dt>
+          <dd class="col-sm-10">
+          {% for genre in media.genres %} 
+              <span class="badge text-bg-light">{{ genre.name }}</span>
+          {% endfor %}
+          </dd>
+          {% endif %}
+      </dl>
+
+      {% if type == 'tv' %}
+      <div class="inline">
+        <button type="button" class="btn btn-outline-secondary">Seasons Info</button>
+      </div>
+      {% endif %}
+
+      <button type="button" class="btn btn-outline-dark inline-block" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+        <span>&#43;</span>
+      </button>
+
+        <!-- Modal -->
+      <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                {% if type == 'movie' %}
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Add '{{ media.title }}' to a List</h1>
+                {% elif type == 'tv' %}
+                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Add '{{ media.name }}' to a List</h1>
+                {% endif %}
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                {% for list in lists %}
+                  <div class="form-check">
+                      <input class="form-check-input" type="checkbox" value="">
+                      <label class="form-check-label" for="flexCheckDefault" id="{{ list.id }}">
+                        {{ list.title }}
+                      </label>
+                  </div>
+                {% endfor %}
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+            </div>
         </div>
       </div>
-      <div class="accordion-item">
-        <h2 class="accordion-header">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-            Accordion Item #2
-          </button>
-        </h2>
-        <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-          <div class="accordion-body">
-            <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-          </div>
-        </div>
-      </div>
-      <div class="accordion-item">
-        <h2 class="accordion-header">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-            Accordion Item #3
-          </button>
-        </h2>
-        <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-          <div class="accordion-body">
-            <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-          </div>
-        </div>
-      </div>
+
     </div>
-  {% endif %}
+  </div>
+</div>
 
+{% if show %}
+<div id='green-alert' class="alert alert-success alert-dismissible fade show" role="alert">
+  <strong>Review saved successfully.</strong> You can edit it in the form below.
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">Write a Review</h5>
+    {% if message %}
+      {{ message }}
+    {% endif %}
+    <form method="post">
+      {% csrf_token %}
+      {{ review_form }}
+      <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+    
+  </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'tracker/confid.js' %}"></script>
+    <script src="{% static 'tracker/info.js' %}"></script>
 {% endblock %}

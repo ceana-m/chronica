@@ -8,13 +8,18 @@ urlpatterns = [
     path("register", views.register, name='register'),
     path("logout", views.logout_view, name='logout'),
 
-    # path("search", views.search, name='search'),
     path("books", views.books, name='books'),
     path("movies", views.movies, name='movies'),
     path("movies/<int:id>", views.movie_info, name='movie_info'),
     path("tv", views.tv, name='tv'),
     path("tv/<int:id>", views.tv_info, name='tv_info'),
 
-    path("users/<str:user>", views.user, name='user'),
+    path("users/<str:user>/lists", views.user_lists, name='user_lists'),
     path("users/<str:user>/lists/<int:id>", views.list_view, name='list'),
+
+    # API Methods
+    path("api/movie_review/<int:id>", views.movie_review, name='movie_review'),
+    path("api/lists/<int:list_id>", views.lists_api, name='lists_api'),
+    path("api/review/<str:media_type>/<int:media_id>", views.review, name='review'),
+    path("api/media/<str:media_type>/<int:media_id>", views.media, name='media'),
 ]
