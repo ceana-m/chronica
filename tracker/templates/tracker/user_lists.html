@@ -29,7 +29,7 @@
                     </div>
                     <div class="modal-footer">
                         <!-- <button type="submit" class="btn btn-secondary" data-bs-dismiss="modal">Save</button> -->
-                        <button type="submit" class="btn btn-secondary">Save</button>
+                        <button type="submit" class="btn btn-success">Save</button>
                     </div>
                 </form>
                 
@@ -52,4 +52,15 @@
     
     {% endfor %}
 
+{% endblock %}
+
+{% block script %}
+    <script>
+        // Force reload to update HTML from https://stackoverflow.com/questions/43043113/how-to-force-reloading-a-page-when-using-browser-back-button
+        var perfEntries = performance.getEntriesByType("navigation");
+
+        if (perfEntries[0].type === "back_forward") {
+            location.reload();
+        }
+    </script>
 {% endblock %}

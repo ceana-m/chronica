@@ -45,7 +45,73 @@ def movies(request):
     })
 
 def movie_info(request, id):
-    url = f"https://api.themoviedb.org/3/movie/{id}?language=en-U"
+    return get_info(request, id, 'movie')
+    pass
+    # url = f"https://api.themoviedb.org/3/movie/{id}?language=en-U"
+    # headers = {
+    #     "accept": "application/json",
+    #     "Authorization": f"Bearer {TMDB_TOKEN}"
+    # }
+    # response = requests.get(url, headers=headers)
+    # response_data = response.json()
+    # try:
+    #     media = Media.objects.get(obj_id=response_data['id'], media_type='movie')
+    #     review = Review.objects.get(user=get_current_user(request), media=media)
+    #     old_review = NewReview(instance=review)
+    # except Review.DoesNotExist:
+    #     review = 0
+    #     old_review = NewReview()
+    # except Media.DoesNotExist:
+    #     media = 0
+    #     old_review = NewReview()
+
+    # # prev_review = Review.objects.get()
+    # if request.method == "POST":
+    #     form = NewReview(request.POST)
+    #     error = {
+    #         'type': 'movie',
+    #         'media': response_data,
+    #         'message': 'Please enter a valid rating number (0.0 - 5.0 with 0.5 increments)',
+    #         'review_form': form,
+    #         'lists': List.objects.filter(user=get_current_user(request))
+    #     }
+    #     if form.is_valid():
+    #         rating = form.cleaned_data['rating']
+    #         text = form.cleaned_data['text']
+    #         vals = arange(0.0, 5.1, 0.5)
+    #         if rating not in vals:
+    #             return render(request, "tracker/info.html", error)
+            
+    #         if media == 0:
+    #             media = Media.objects.create(obj_id=response_data['id'], media_type='movie', data=response_data)
+    #             review = Review.objects.create(user=get_current_user(request), rating=rating, text=text, media=media)
+    #         elif review == 0:
+    #             review = Review.objects.create(user=get_current_user(request), rating=rating, text=text, media=media)
+    #         else:
+    #             review.rating = rating
+    #             review.text = text
+    #             review.save()
+
+    #         return render(request, "tracker/info.html", {
+    #             'type': 'movie',
+    #             'media': response.json(),
+    #             'review_form': NewReview(instance=review),
+    #             'lists': List.objects.filter(user=get_current_user(request)),
+    #             'show': True
+    #         })
+    #     else:
+    #         return render(request, "tracker/info.html", error)
+
+    # return render(request, "tracker/info.html", {
+    #     'type': 'movie',
+    #     'media': response.json(),
+    #     'review_form': old_review,
+    #     'lists': List.objects.filter(user=get_current_user(request))
+    # })
+
+def get_info(request, id, mtype):
+    # Valid types are movie, tv
+    url = f"https://api.themoviedb.org/3/{mtype}/{id}?language=en-U"
     headers = {
         "accept": "application/json",
         "Authorization": f"Bearer {TMDB_TOKEN}"
@@ -53,7 +119,7 @@ def movie_info(request, id):
     response = requests.get(url, headers=headers)
     response_data = response.json()
     try:
-        media = Media.objects.get(obj_id=response_data['id'], media_type='movie')
+        media = Media.objects.get(obj_id=response_data['id'], media_type=mtype)
         review = Review.objects.get(user=get_current_user(request), media=media)
         old_review = NewReview(instance=review)
     except Review.DoesNotExist:
@@ -81,17 +147,17 @@ def movie_info(request, id):
                 return render(request, "tracker/info.html", error)
             
             if media == 0:
-                media = Media.objects.create(obj_id=response_data['id'], media_type='movie', data=response_data)
-                Review.objects.create(user=get_current_user(request), rating=rating, text=text, media=media)
+                media = Media.objects.create(obj_id=response_data['id'], media_type=mtype, data=response_data)
+                review = Review.objects.create(user=get_current_user(request), rating=rating, text=text, media=media)
             elif review == 0:
-                Review.objects.create(user=get_current_user(request), rating=rating, text=text, media=media)
+                review = Review.objects.create(user=get_current_user(request), rating=rating, text=text, media=media)
             else:
                 review.rating = rating
                 review.text = text
                 review.save()
 
             return render(request, "tracker/info.html", {
-                'type': 'movie',
+                'type': mtype,
                 'media': response.json(),
                 'review_form': NewReview(instance=review),
                 'lists': List.objects.filter(user=get_current_user(request)),
@@ -101,7 +167,7 @@ def movie_info(request, id):
             return render(request, "tracker/info.html", error)
 
     return render(request, "tracker/info.html", {
-        'type': 'movie',
+        'type': mtype,
         'media': response.json(),
         'review_form': old_review,
         'lists': List.objects.filter(user=get_current_user(request))
@@ -113,17 +179,29 @@ def tv(request):
     })
 
 def tv_info(request, id):
-    url = f"https://api.themoviedb.org/3/tv/{id}?language=en-U"
+    return get_info(request, id, 'tv')
+    # url = f"https://api.themoviedb.org/3/tv/{id}?language=en-U"
+    # headers = {
+    #     "accept": "application/json",
+    #     "Authorization": f"Bearer {TMDB_TOKEN}"
+    # }
+    # response = requests.get(url, headers=headers)
+
+    # return render(request, "tracker/info.html", {
+    #     'type': 'tv',
+    #     'media': response.json(),
+    #     'review_form': NewReview()
+    # })
+
+def tv_seasons(request, id):
+    url = f"https://api.themoviedb.org/3/tv/{id}?language=en-US"
     headers = {
         "accept": "application/json",
         "Authorization": f"Bearer {TMDB_TOKEN}"
     }
     response = requests.get(url, headers=headers)
-
-    return render(request, "tracker/info.html", {
-        'type': 'tv',
-        'media': response.json(),
-        'review_form': NewReview()
+    return render(request, "tracker/seasons.html", {
+        'media': response.json()
     })
 
 def list_view(request, user, id):
@@ -133,21 +211,13 @@ def list_view(request, user, id):
         return render(request, "tracker/error.html")
     return render(request, "tracker/list.html", {
         'person': user,
-        'list': list_obj
+        'list': list_obj,
+        'items': list_obj.media.all(),
     })
 
 # Helper method
 def get_current_user(request):
     return User.objects.get(username=request.user.username)
-
-def format_media_type(media_type):
-    if media_type == 'movie':
-        return 'Movie'
-    elif media_type == 'tv':
-        return 'TV'
-    elif media_type == 'book':
-        return 'Book'
-    return None
 
 # Code below and their corresponding templates adapted from previous assignments
 def login_view(request):
@@ -247,6 +317,15 @@ def lists_api(request, list_id):
     # Update 
     elif request.method == "PUT":
         data = json.loads(request.body)
+        if data.get('action') == 'edit':
+            if data.get('title') is not None:
+                list_obj.title = data["title"]
+            if data.get('desc') is not None:
+                list_obj.description = data["desc"]
+            list_obj.save()
+            return HttpResponse(status=204)
+        
+
         try: 
             media = Media.objects.get(media_type=data.get('mediaType'), obj_id=data.get('obj_id'))
         except Media.DoesNotExist:
@@ -271,8 +350,12 @@ def lists_api(request, list_id):
                 }, status=400)
         else:
             return JsonResponse({
-                "error": "Must provide valid List action ('add' or 'remove')."
+                "error": "Must provide valid List action ('add', 'remove', 'edit')."
             }, status=400)
+        return HttpResponse(status=204)
+    
+    elif request.method == "DELETE":
+        list_obj.delete()
         return HttpResponse(status=204)
 
     #List must be via GET or PUT

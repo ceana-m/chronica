@@ -13,6 +13,7 @@ urlpatterns = [
     path("movies/<int:id>", views.movie_info, name='movie_info'),
     path("tv", views.tv, name='tv'),
     path("tv/<int:id>", views.tv_info, name='tv_info'),
+    path("tv/<int:id>/seasons", views.tv_seasons, name='tv_seasons'),
 
     path("users/<str:user>/lists", views.user_lists, name='user_lists'),
     path("users/<str:user>/lists/<int:id>", views.list_view, name='list'),

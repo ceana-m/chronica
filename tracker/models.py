@@ -27,7 +27,7 @@ class Media(models.Model):
         verbose_name_plural = "Media"
 
     def __str__(self):
-        return f"{ self.id }: [{ self.obj_id }] { self.media_type } - { self.data }"
+        return f"{ self.id }: [{ self.obj_id }] { self.media_type }"
     
     def serialize(self):
         return {
@@ -39,7 +39,7 @@ class Media(models.Model):
 
 class List(models.Model):
     user = models.ForeignKey(User, on_delete=models.PROTECT, related_name='all_lists')
-    title = models.CharField(max_length=50)
+    title = models.CharField(max_length=50, blank=True)
     description = models.TextField(max_length=500, blank=True)
     media = models.ManyToManyField(Media, related_name='all_appearances')
     time = models.DateTimeField(auto_now_add=True)
@@ -71,6 +71,7 @@ class Review(models.Model):
     rating = models.DecimalField(max_digits=2, decimal_places=1)
     text = models.TextField(max_length=1000, blank=True)
     media = models.ForeignKey(Media, on_delete=models.PROTECT, related_name='all_media_reviews')
+    time = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         if self.text == '':

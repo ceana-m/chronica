@@ -6,6 +6,10 @@
     align-items: center;
 }
 
+#edit_window {
+    display: none;
+}
+
 .inline {
     display: inline;
 }
@@ -31,6 +35,13 @@
     margin-bottom: 7px;
 }
 
+#icons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 75vh;
+}
+
 .indent {
     margin: 1vw;
 }
@@ -42,7 +53,7 @@
 
 .info-card {
     display: inline-block; 
-    width: 85rem; 
+    width: 70rem; 
     border-width: 0px;
 }
 

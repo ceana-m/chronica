@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Get id of media
     const path = window.location.pathname;
     const id = path.substring(path.lastIndexOf('/') + 1);
 
@@ -14,17 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
         errors[0].remove();
     }
 
-    
-    let count = 0;
-
+    // Checks if item is on any lists and changes checkbox state
     const checkDivs = document.getElementsByClassName('form-check');
-    console.log(checkDivs);
+    let count = 0;
     Array.from(checkDivs).forEach(div => {
         const checkbox = div.children[0];
         const list_id = div.children[1].id;
-        
-        console.log(checkbox);
-
         fetch(`/api/lists/${list_id}`)
         .then(response => response.json())
         .then(response => {
@@ -35,13 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         })
-        
 
-        // https://stackoverflow.com/questions/6358673/javascript-checkbox-onchange used for checking the state of a checkbox
+        // Code from https://stackoverflow.com/questions/6358673/javascript-checkbox-onchange used for checking the state of a checkbox
         checkbox.addEventListener('change', (event) => {
             if (event.currentTarget.checked) {
-                alert('test');
-
                 const options = {
                     method: 'GET',
                     headers: {
@@ -50,11 +43,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 };
                 
+                // Get media object from TMDB
                 fetch(`https://api.themoviedb.org/3/${mediaType}/${id}?language=en-US`, options)
                 .then(response => response.json())
                 .then(response => {
-                    console.log(response);
-
+                    // Creates media object to be stored in the database
                     fetch(`/api/media/${mediaType}/${id}`, {
                         method: 'POST',
                         headers: {
@@ -68,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         })
                     });
 
+                    // Adds media object to list
                     fetch(`/api/lists/${list_id}`, {
                         method: 'PUT',
                         headers: {
@@ -85,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .catch(err => console.error(err));
 
             } else {
-                alert('ah');
+                // Removes media object from list
                 fetch(`/api/lists/${list_id}`, {
                     method: 'PUT',
                     headers: {

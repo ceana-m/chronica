@@ -32,6 +32,7 @@ function getMediaType() {
  */
 function displaySearchResults(query) {
     let mediaType = getMediaType();
+    document.getElementById('icons').style.display = 'none';
     if (mediaType === 'tv' || mediaType === 'movie') {
         const options = {
             method: 'GET',
@@ -74,21 +75,21 @@ function displaySearchResults(query) {
     } else if (mediaType === 'book') {
         alert('test');
         fetch(`https://openlibrary.org/search.json?q=${query}`)
-            .then(response => response.json())
-            .then(results => {
-                // console.log(results);
-                results.docs.forEach(element => {
-                    console.log(element.key)
+        .then(response => response.json())
+        .then(results => {
+            // console.log(results);
+            results.docs.forEach(element => {
+                console.log(element.key)
 
-                    fetch(`https://openlibrary.org${element.key}.json`)
-                    .then(response => response.json())
-                    .then(book => {
-                        console.log(book);
-                
-                    })
-                    .catch(err => console.error(err));
-                });
+                fetch(`https://openlibrary.org${element.key}.json`)
+                .then(response => response.json())
+                .then(book => {
+                    console.log(book);
+            
+                })
+                .catch(err => console.error(err));
             });
+        });
     }
 }
 
@@ -138,9 +139,6 @@ function loadItems(response) {
             link.innerHTML += `
             <div class="card-body" style="padding: 0px;">
                 <span class="badge text-bg-success">TV</span>
-                <button type="button" class="btn btn-outline-dark plus tvbtn">
-                <span>&#43;</span>
-                </button>
                 <p class="card-text title"><small>${element.name}</small></p>
             </div>
             `

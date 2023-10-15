@@ -6,25 +6,64 @@
 {% endblock %}
 
 {% block body %}
-    <h2>{{ list.title }}</h2>
-    <p>{{ list.description }}</p>
-    <button type="button" class="btn btn-outline-danger">Delete List</button>
-    <button type="button" class="btn btn-outline-primary">Edit</button>
+    <div id="head">
+        <h2 id="title">{{ list.title }}</h2>
+        <p id="desc">{{ list.description }}</p> 
+    </div>
+    <div id="edit_window">
+        <input id="title_input" type="text" class="form-control"></input>
+        <textarea id="desc_input" maxlength=500 cols="40" rows="4" class="form-control"></textarea>
+    </div>
+
+
+    {% if list.user.username == user.username %}
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">Delete List</button>
+    
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Delete '{{ list.title }}' list?</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                This action cannot be undone.
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button id="delete" type="button" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button id="edit" type="button" class="btn btn-outline-primary">Edit</button>
+    {% endif %}
+
     <hr/>
+
     <div class="display"  style="margin-left: 12.4vw; margin-right: 5vw;">
-        {% for item in list.media.all %}
+        {% for item in items %}
             <div class="card media shadow-sm">
             <a class="link" href="/movies/{{ item.data.id }}">
                     <img src="https://image.tmdb.org/t/p/w185{{item.data.poster_path}}" class="card-img-top" alt="Poster">
                     <div class="card-body" style="padding: 0px;">
+                        {% if item.media_type == 'movie' %}
                         <span class="badge text-bg-danger">Movie</span>
-                        <p class="card-text">{{ item.data.title }}</p>
+                        <p class="card-text title">{{ item.data.title }}</p>
+                        {%  elif item.media_type == 'tv' %}
+                        <span class="badge text-bg-success">TV</span>
+                        <p class="card-text title">{{ item.data.name }}</p>
+                        {% endif %}
                     </div>
                 </a> 
             </div>
         {% endfor %}
     </div>
     
+    <div id="csrf" hidden>{{ csrf_token }}</div>
 {% endblock %}
 
 {% block script %}

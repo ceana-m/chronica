@@ -51,11 +51,19 @@
               <dt class="col-sm-2">Total Episodes</dt>
               <dd class="col-sm-10">{{ media.number_of_episodes }}</dd>
               
+              {% if media.episode_run_time %}
               <dt class="col-sm-2">Episode Runtime</dt>
               <dd class="col-sm-10">{% for time in media.episode_run_time %}{{ time }}{% endfor %} minutes</dd>
+              {% endif %}
 
+              {% if media.first_air_date %}
               <dt class="col-sm-2">Airing</dt>
+              {% if media.last_air_date %}
               <dd class="col-sm-10">{{ media.first_air_date }} to {{ media.last_air_date }}</dd>
+              {% else %}
+              <dd class="col-sm-10">{{ media.first_air_date }} to Present</dd>
+              {% endif %}
+              {% endif %}
           {% endif %}
           <dt class="col-sm-2">Status</dt>
           <dd class="col-sm-10"><i>{{ media.status }}</i></dd>
@@ -72,7 +80,7 @@
 
       {% if type == 'tv' %}
       <div class="inline">
-        <button type="button" class="btn btn-outline-secondary">Seasons Info</button>
+        <a role="button" class="btn btn-outline-secondary" href="{% url 'tv_seasons' media.id %}">Seasons Info</a>
       </div>
       {% endif %}
 
