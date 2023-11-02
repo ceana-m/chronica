@@ -93,10 +93,6 @@ function displaySearchResults(query) {
     }
 }
 
-function displayTrending() {
-
-}
-
 /**
  * Helper method to display search results. 
  * @param {JSON} response all relevant info about the searched query

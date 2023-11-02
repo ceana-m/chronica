@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Get id of media
     const path = window.location.pathname;
     const id = path.substring(path.lastIndexOf('/') + 1);
+    const listNumber = document.getElementById('number');
 
     let mediaType;
     if (path.includes('movies')) {
@@ -19,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkDivs = document.getElementsByClassName('form-check');
     let count = 0;
     Array.from(checkDivs).forEach(div => {
+        // Change checkbox state if media in corresponding list
         const checkbox = div.children[0];
         const list_id = div.children[1].id;
         fetch(`/api/lists/${list_id}`)
@@ -30,7 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     count+=1;
                 }
             });
-        })
+            listNumber.innerHTML = count;
+        });
 
         // Code from https://stackoverflow.com/questions/6358673/javascript-checkbox-onchange used for checking the state of a checkbox
         checkbox.addEventListener('change', (event) => {
@@ -75,6 +78,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         })
                     });
 
+                    // Update list count
+                    listNumber.innerHTML = `${++listNumber.innerHTML}`
+
                 })
                 .catch(err => console.error(err));
 
@@ -92,13 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         action: 'remove'
                     })
                 });
+
+                // Update list count
+                listNumber.innerHTML = `${--listNumber.innerHTML}`
             }
         });
     });
 
-    // alert(count);
-
-    // const listBadge = document.getElementById('list-count');
-    // alert(listBadge.innerHTML);
-    // listBadge.innerHTML = `Added to ${count} lists`;
 });

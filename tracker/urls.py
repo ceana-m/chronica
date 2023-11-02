@@ -17,10 +17,11 @@ urlpatterns = [
 
     path("users/<str:user>/lists", views.user_lists, name='user_lists'),
     path("users/<str:user>/lists/<int:id>", views.list_view, name='list'),
+    path("users/<str:user>/reviewed", views.reviewed, name='reviewed'),
 
     # API Methods
-    path("api/movie_review/<int:id>", views.movie_review, name='movie_review'),
+    # path("api/movie_review/<int:id>", views.movie_review, name='movie_review'),
     path("api/lists/<int:list_id>", views.lists_api, name='lists_api'),
-    path("api/review/<str:media_type>/<int:media_id>", views.review, name='review'),
-    path("api/media/<str:media_type>/<int:media_id>", views.media, name='media'),
+    path("api/review/<str:media_type>/<int:media_id>", views.review_api, name='review_api'),
+    path("api/media/<str:media_type>/<int:media_id>", views.media_api, name='media_api'),
 ]

@@ -94,6 +94,10 @@
     text-decoration: none;
 }
 
+.spacing {
+    margin-left: 1.7vw;
+}
+
 .title {
     white-space: nowrap;
     overflow: hidden;

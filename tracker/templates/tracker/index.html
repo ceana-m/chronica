@@ -4,9 +4,34 @@
 {% block body %}
     <h2>Trending</h2>
     <h3>Movies</h3>
-    <div id="trend_movie"></div>
+    <div id="trend_movie">
+        {% for m in movies %}
+            <div class="card media shadow-sm">
+            <a class="link" href="/movies/{{ m.id }}">
+                <img src="https://image.tmdb.org/t/p/w185{{ m.poster_path }}" class="card-img-top" alt="Poster">
+                <div class="card-body" style="padding: 0px;">
+                    <span class="badge text-bg-danger">Movie</span>
+                    <p class="card-text title">{{ m.title }}</p>
+                </div>
+            </a> 
+        </div>
+        {% endfor %}
+    </div>
+    <hr/>
     <h3>TV</h3>
-    <div id="trend_tv"></div>
+    <div id="trend_tv">
+        {% for t in tv %}
+            <div class="card media shadow-sm">
+            <a class="link" href="/tv/{{ t.id }}">
+                <img src="https://image.tmdb.org/t/p/w185{{ t.poster_path }}" class="card-img-top" alt="Poster">
+                <div class="card-body" style="padding: 0px;">
+                    <span class="badge text-bg-success">TV</span>
+                    <p class="card-text title">{{ t.name }}</p>
+                </div>
+            </a> 
+        </div>
+        {% endfor %}
+    </div>
 
 {% endblock %}
 

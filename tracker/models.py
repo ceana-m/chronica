@@ -4,15 +4,6 @@ from django.db import models
 class User(AbstractUser):
     pass
 
-# class Book(models.Model):
-#     pass
-
-class Movie(models.Model):
-    data = models.JSONField()
-
-# class TVShow(models.Model):
-#     pass
-
 class Media(models.Model):
     TYPE_CHOICES = [
         ("Movie", "Movie"),

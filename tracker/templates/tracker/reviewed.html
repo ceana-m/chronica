@@ -1,0 +1,36 @@
+{% extends "tracker/layout.html" %}
+{% load static %}
+
+{% block title %}
+    Reviewed Items
+{% endblock %}
+
+{% block body %}
+<h2>{{ user.username }}'s Reviewed Items</h2>
+<hr/>
+<div class="display" style="margin-left: 12.4vw; margin-right: 5vw;">
+    {% for item in items %}
+        <div class="card media shadow-sm">
+        {% if item.media_type == 'movie' %}
+        <a class="link" href="/movies/{{ item.data.id }}">
+        {%  elif item.media_type == 'tv' %}
+        <a class="link" href="/tv/{{ item.data.id }}">
+        {% endif %}
+                <img src="https://image.tmdb.org/t/p/w185{{item.data.poster_path}}" class="card-img-top" alt="Poster">
+                <div class="card-body" style="padding: 0px;">
+                    {% if item.media_type == 'movie' %}
+                    <span class="badge text-bg-danger">Movie</span>
+                    <p class="card-text title">{{ item.data.title }}</p>
+                    {%  elif item.media_type == 'tv' %}
+                    <span class="badge text-bg-success">TV</span>
+                    <p class="card-text title">{{ item.data.name }}</p>
+                    {% endif %}
+                </div>
+            </a> 
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block script %}
+{% endblock %}

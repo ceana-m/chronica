@@ -16,7 +16,21 @@ import requests
 
 
 def index(request):
-    return render(request, "tracker/index.html")
+    url1 = "https://api.themoviedb.org/3/trending/movie/week?language=en-US"
+    url2 = "https://api.themoviedb.org/3/trending/tv/week?language=en-US"
+    headers = {
+        "accept": "application/json",
+        "Authorization": f"Bearer {TMDB_TOKEN}"
+    }
+    m_response = requests.get(url1, headers=headers)
+    m_data = m_response.json()
+    t_response = requests.get(url2, headers=headers)
+    t_data = t_response.json()
+
+    return render(request, "tracker/index.html", {
+        'movies': m_data['results'],
+        'tv': t_data['results']
+    })
 
 @login_required(login_url='/login')
 def user_lists(request, user):
@@ -46,68 +60,6 @@ def movies(request):
 
 def movie_info(request, id):
     return get_info(request, id, 'movie')
-    pass
-    # url = f"https://api.themoviedb.org/3/movie/{id}?language=en-U"
-    # headers = {
-    #     "accept": "application/json",
-    #     "Authorization": f"Bearer {TMDB_TOKEN}"
-    # }
-    # response = requests.get(url, headers=headers)
-    # response_data = response.json()
-    # try:
-    #     media = Media.objects.get(obj_id=response_data['id'], media_type='movie')
-    #     review = Review.objects.get(user=get_current_user(request), media=media)
-    #     old_review = NewReview(instance=review)
-    # except Review.DoesNotExist:
-    #     review = 0
-    #     old_review = NewReview()
-    # except Media.DoesNotExist:
-    #     media = 0
-    #     old_review = NewReview()
-
-    # # prev_review = Review.objects.get()
-    # if request.method == "POST":
-    #     form = NewReview(request.POST)
-    #     error = {
-    #         'type': 'movie',
-    #         'media': response_data,
-    #         'message': 'Please enter a valid rating number (0.0 - 5.0 with 0.5 increments)',
-    #         'review_form': form,
-    #         'lists': List.objects.filter(user=get_current_user(request))
-    #     }
-    #     if form.is_valid():
-    #         rating = form.cleaned_data['rating']
-    #         text = form.cleaned_data['text']
-    #         vals = arange(0.0, 5.1, 0.5)
-    #         if rating not in vals:
-    #             return render(request, "tracker/info.html", error)
-            
-    #         if media == 0:
-    #             media = Media.objects.create(obj_id=response_data['id'], media_type='movie', data=response_data)
-    #             review = Review.objects.create(user=get_current_user(request), rating=rating, text=text, media=media)
-    #         elif review == 0:
-    #             review = Review.objects.create(user=get_current_user(request), rating=rating, text=text, media=media)
-    #         else:
-    #             review.rating = rating
-    #             review.text = text
-    #             review.save()
-
-    #         return render(request, "tracker/info.html", {
-    #             'type': 'movie',
-    #             'media': response.json(),
-    #             'review_form': NewReview(instance=review),
-    #             'lists': List.objects.filter(user=get_current_user(request)),
-    #             'show': True
-    #         })
-    #     else:
-    #         return render(request, "tracker/info.html", error)
-
-    # return render(request, "tracker/info.html", {
-    #     'type': 'movie',
-    #     'media': response.json(),
-    #     'review_form': old_review,
-    #     'lists': List.objects.filter(user=get_current_user(request))
-    # })
 
 def get_info(request, id, mtype):
     # Valid types are movie, tv
@@ -158,7 +110,7 @@ def get_info(request, id, mtype):
 
             return render(request, "tracker/info.html", {
                 'type': mtype,
-                'media': response.json(),
+                'media': response_data,
                 'review_form': NewReview(instance=review),
                 'lists': List.objects.filter(user=get_current_user(request)),
                 'show': True
@@ -168,7 +120,7 @@ def get_info(request, id, mtype):
 
     return render(request, "tracker/info.html", {
         'type': mtype,
-        'media': response.json(),
+        'media': response_data,
         'review_form': old_review,
         'lists': List.objects.filter(user=get_current_user(request))
     })
@@ -180,18 +132,6 @@ def tv(request):
 
 def tv_info(request, id):
     return get_info(request, id, 'tv')
-    # url = f"https://api.themoviedb.org/3/tv/{id}?language=en-U"
-    # headers = {
-    #     "accept": "application/json",
-    #     "Authorization": f"Bearer {TMDB_TOKEN}"
-    # }
-    # response = requests.get(url, headers=headers)
-
-    # return render(request, "tracker/info.html", {
-    #     'type': 'tv',
-    #     'media': response.json(),
-    #     'review_form': NewReview()
-    # })
 
 def tv_seasons(request, id):
     url = f"https://api.themoviedb.org/3/tv/{id}?language=en-US"
@@ -213,6 +153,16 @@ def list_view(request, user, id):
         'person': user,
         'list': list_obj,
         'items': list_obj.media.all(),
+    })
+
+def reviewed(request, user):
+    reviews = Review.objects.filter(user=get_current_user(request)).all()
+    items = []
+    for r in reviews:
+        items.append(r.media)
+    return render(request, "tracker/reviewed.html", {
+        'person': user,
+        'items': items,
     })
 
 # Helper method
@@ -272,36 +222,6 @@ def register(request):
         return render(request, "tracker/register.html")
     
 #API methods (based on prev assignments)
-def movie_review(request, id):
-    # Query for requested movie
-    try:
-        review = Review.objects.get(pk=id)
-    except Movie.DoesNotExist:
-        return JsonResponse({"error": "Review not found."}, status=404)
-
-    # Return movie attributes
-    if request.method == "GET":
-        return JsonResponse(review.serialize())
-
-    # Update 
-    elif request.method == "POST":
-        data = json.loads(request.body)
-        if data.get('rating') is not None:
-            review.rating = data["rating"]
-        if data.get('text') is not None:
-            review.text = data["text"]
-        else:
-            return JsonResponse({
-                "error": "Must provide a rating or text for the movie."
-            }, status=400)
-        review.save()
-        return HttpResponse(status=204)
-
-    # Movie must be via GET or PUT
-    else:
-        return JsonResponse({
-            "error": "GET or POST request required."
-        }, status=400)
 
 def lists_api(request, list_id):
     # Query for requested list
@@ -364,26 +284,38 @@ def lists_api(request, list_id):
             "error": "GET or PUT request required."
         }, status=400)
     
-def review(request, id): # This needs to be fixed (add POST??)
+def review_api(request, media_type, media_id):
     try:
-        review = Review.objects.get(pk=id)
-    except Movie.DoesNotExist:
-        return JsonResponse({"error": "Review not found."}, status=404)
+        media = Media.objects.get(media_type=media_type, obj_id=media_id)
+        rev_obj = Review.objects.get(media=media)
+    except Media.DoesNotExist:
+        return JsonResponse({"error": "Media not found."}, status=404)
+    except Review.DoesNotExist:
+        if request.method == "POST":
+            if data.get('rating') is not None:
+                if data.get('text') is not None:
+                    Review.objects.create(user=get_current_user(request), rating=data.get('rating'), text=data.get('text'), media=media)
+                else:
+                    Review.objects.create(user=get_current_user(request), rating=data.get('rating'), media=media)
+            else:
+                return JsonResponse({"error": "Must provide numerical rating."}, status=404)
+        else:
+            return JsonResponse({"error": "Review not found."}, status=404)
 
     if request.method == "GET":
-        return JsonResponse(review.serialize())
+        return JsonResponse(rev_obj.serialize())
 
-    elif request.method == "POST":
+    elif request.method == "PUT":
         data = json.loads(request.body)
         if data.get('rating') is not None:
-            review.rating = data["rating"]
-        if data.get('text') is not None:
-            review.text = data["text"]
+            rev_obj.rating = data["rating"]
         else:
             return JsonResponse({
                 "error": "Must provide a rating for the review."
             }, status=400)
-        review.save()
+        if data.get('text') is not None:
+            rev_obj.text = data["text"]
+        rev_obj.save()
         return HttpResponse(status=204)
 
     else:
@@ -392,7 +324,7 @@ def review(request, id): # This needs to be fixed (add POST??)
         }, status=400)
     
 @ensure_csrf_cookie
-def media(request, media_type, media_id):
+def media_api(request, media_type, media_id):
     try:
         media = Media.objects.get(media_type=media_type, obj_id=media_id)
     except Media.DoesNotExist:
@@ -418,6 +350,7 @@ def media(request, media_type, media_id):
         else:
             return JsonResponse({"error": "Media item not found. POST request required."}, status=404)
     
+    # If it already exists don't do anything
     if request.method == "POST":
         return HttpResponse(status=204)
 

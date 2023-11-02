@@ -1,10 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Force reload to update HTML from https://stackoverflow.com/questions/43043113/how-to-force-reloading-a-page-when-using-browser-back-button
-    var perfEntries = performance.getEntriesByType("navigation");
-    if (perfEntries[0].type === "back_forward") {
-        location.reload();
-    }
-
     const delButton = document.getElementById('delete');
     const path = window.location.pathname;
     const id = path.substring(path.lastIndexOf('/') + 1);
@@ -69,4 +63,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
