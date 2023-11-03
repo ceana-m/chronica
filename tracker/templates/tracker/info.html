@@ -84,6 +84,7 @@
       </div>
       {% endif %}
 
+      
       <button type="button" class="btn btn-outline-dark inline-block" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
         <span>&#43;</span>
       </button>
@@ -101,6 +102,7 @@
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
+                {% if user.is_authenticated %}
                 {% for list in lists %}
                   <div class="form-check">
                       <input class="form-check-input" type="checkbox" value="">
@@ -108,7 +110,12 @@
                         {{ list.title }}
                       </label>
                   </div>
+                {% empty %}
+                <a class="redirect" href="{% url 'user_lists' user %}">Create a list here.</a>
                 {% endfor %}
+                {% else %}
+                <span><a class="redirect" href="{% url 'login' %}">Log in</a> or <a class="redirect" href="{% url 'register' %}">register for an account</a> to add items to lists.</span>
+                {% endif %}
               </div>
               <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -121,6 +128,7 @@
   </div>
 </div>
 
+{% if user.is_authenticated %}
 {% if show %}
 <div id='green-alert' class="alert alert-success alert-dismissible fade show" role="alert">
   <strong>Review saved successfully.</strong> You can edit it in the form below.
@@ -142,6 +150,7 @@
     
   </div>
 </div>
+{% endif %}
 
 {% endblock %}
 

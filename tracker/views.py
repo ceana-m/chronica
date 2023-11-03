@@ -48,11 +48,6 @@ def user_lists(request, user):
         'lists': List.objects.filter(user=User.objects.get(username=user))
     })
 
-def books(request):
-    return render(request, "tracker/content.html", {
-        'type': 'Book'
-    })
-
 def movies(request):
     return render(request, "tracker/content.html", {
         'type': 'Movie'
@@ -70,9 +65,22 @@ def get_info(request, id, mtype):
     }
     response = requests.get(url, headers=headers)
     response_data = response.json()
+
+    # Checks if user is logged in
+    try:
+        user = get_current_user(request)
+    except User.DoesNotExist:
+        return render(request, "tracker/info.html", {
+                'type': mtype,
+                'media': response_data,
+                'review_form': None,
+                'lists': None
+            })
+
+    # Searches for media type
     try:
         media = Media.objects.get(obj_id=response_data['id'], media_type=mtype)
-        review = Review.objects.get(user=get_current_user(request), media=media)
+        review = Review.objects.get(user=user, media=media)
         old_review = NewReview(instance=review)
     except Review.DoesNotExist:
         review = 0
@@ -89,7 +97,7 @@ def get_info(request, id, mtype):
             'media': response_data,
             'message': 'Please enter a valid rating number (0.0 - 5.0 with 0.5 increments)',
             'review_form': form,
-            'lists': List.objects.filter(user=get_current_user(request))
+            'lists': List.objects.filter(user=user)
         }
         if form.is_valid():
             rating = form.cleaned_data['rating']
@@ -100,9 +108,9 @@ def get_info(request, id, mtype):
             
             if media == 0:
                 media = Media.objects.create(obj_id=response_data['id'], media_type=mtype, data=response_data)
-                review = Review.objects.create(user=get_current_user(request), rating=rating, text=text, media=media)
+                review = Review.objects.create(user=user, rating=rating, text=text, media=media)
             elif review == 0:
-                review = Review.objects.create(user=get_current_user(request), rating=rating, text=text, media=media)
+                review = Review.objects.create(user=user, rating=rating, text=text, media=media)
             else:
                 review.rating = rating
                 review.text = text
@@ -112,7 +120,7 @@ def get_info(request, id, mtype):
                 'type': mtype,
                 'media': response_data,
                 'review_form': NewReview(instance=review),
-                'lists': List.objects.filter(user=get_current_user(request)),
+                'lists': List.objects.filter(user=user),
                 'show': True
             })
         else:
@@ -122,7 +130,7 @@ def get_info(request, id, mtype):
         'type': mtype,
         'media': response_data,
         'review_form': old_review,
-        'lists': List.objects.filter(user=get_current_user(request))
+        'lists': List.objects.filter(user=user)
     })
 
 def tv(request):
@@ -254,7 +262,7 @@ def lists_api(request, list_id):
             }, status=400)
         
         if data.get('action') in ['add', 'remove']:
-            if data.get('mediaType') in ['movie', 'tv', 'book']:
+            if data.get('mediaType') in ['movie', 'tv']:
                 if data.get('obj_id') is not None:
                     if data.get('action') == 'add':
                         list_obj.media.add(media)
@@ -266,7 +274,7 @@ def lists_api(request, list_id):
                     }, status=400)
             else:
                 return JsonResponse({
-                    "error": "Must provide a valid media type ('movie', 'tv', or 'book')."
+                    "error": "Must provide a valid media type ('movie', 'tv')."
                 }, status=400)
         else:
             return JsonResponse({
@@ -331,7 +339,7 @@ def media_api(request, media_type, media_id):
         if request.method == "POST":
             data = json.loads(request.body)
             if data.get('obj_id') is not None or data.get('media_type') is not None:
-                if data.get('mediaType') in ['movie', 'tv', 'book']:
+                if data.get('mediaType') in ['movie', 'tv']:
                     if data.get('data') is not None:
                         Media.objects.create(obj_id=data['obj_id'], media_type=data["mediaType"], data=json.loads(data['data']))
                         return HttpResponse(status=204)
@@ -341,7 +349,7 @@ def media_api(request, media_type, media_id):
                         }, status=400)
                 else:
                     return JsonResponse({
-                        "error": "Must provide a valid media type ('movie', 'tv', or 'book')."
+                        "error": "Must provide a valid media type ('movie', 'tv')."
                     }, status=400)
             else:
                 return JsonResponse({

@@ -20,15 +20,13 @@ function getMediaType() {
         return 'movie';
     } else if (searchbar.placeholder.includes('TV')) {
         return 'tv';
-    } else if (searchbar.placeholder.includes('Book')) {
-        return 'book';
     }
     return null;
 }
 
 /**
  * Displays the search results for the desired query
- * @param {string} query The title of a book, tv show, or movie
+ * @param {string} query The title of a tv show, or movie
  */
 function displaySearchResults(query) {
     let mediaType = getMediaType();
@@ -72,24 +70,6 @@ function displaySearchResults(query) {
             
         })
         .catch(err => console.error(err));
-    } else if (mediaType === 'book') {
-        alert('test');
-        fetch(`https://openlibrary.org/search.json?q=${query}`)
-        .then(response => response.json())
-        .then(results => {
-            // console.log(results);
-            results.docs.forEach(element => {
-                console.log(element.key)
-
-                fetch(`https://openlibrary.org${element.key}.json`)
-                .then(response => response.json())
-                .then(book => {
-                    console.log(book);
-            
-                })
-                .catch(err => console.error(err));
-            });
-        });
     }
 }
 

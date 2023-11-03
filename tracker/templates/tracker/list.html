@@ -17,6 +17,8 @@
 
 
     {% if list.user.username == user.username %}
+    <button id="edit" type="button" class="btn btn-outline-primary">Edit</button>
+
     <!-- Button trigger modal -->
     <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">Delete List</button>
     
@@ -38,13 +40,11 @@
             </div>
         </div>
     </div>
-
-    <button id="edit" type="button" class="btn btn-outline-primary">Edit</button>
     {% endif %}
 
     <hr/>
 
-    <div class="display"  style="margin-left: 12.4vw; margin-right: 5vw;">
+    <div class="display" style="margin-left: 3%;">
         {% for item in items %}
             <div class="card media shadow-sm">
             {% if item.media_type == 'movie' %}
@@ -64,6 +64,8 @@
                     </div>
                 </a> 
             </div>
+        {% empty %}
+        <i style="margin-left: -3%;">Add items to this list to display here.</i>
         {% endfor %}
     </div>
     
